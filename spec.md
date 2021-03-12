@@ -1,8 +1,8 @@
-# O-RAN Events - Version 0.0.1
+# Cloud Native Events (CNE)- Version 0.0.1
 
 ## Abstract
 
-O-RAN Events Spec is a Rest-API specification for defining the format of event
+Cloud Native Events (CNE) is a Rest-API specification for defining the format of event
 data.
 
 ## Table of Contents
@@ -62,20 +62,20 @@ Occurrence. A single occurrence MAY result in more than one event.
 #### Producer
 
 The "producer" is a specific instance, process or device that creates the data
-structure describing the O-RAN Event.
+structure describing the Cloud Native Events.
 
 #### Source
 
 The "source" is the context in which the occurrence happened. In a distributed
 system it might consist of multiple [Producers](#producer). If a source is not
-aware of O-RAN Event, an external producer creates the O-RAN Event on behalf of
+aware of Cloud Native Events, an external producer creates the Cloud Native Events on behalf of
 the source.
 
 #### Consumer
 
 A "consumer" receives the event and acts upon it. It uses the context and data
 to execute some logic, which might lead to the occurrence of new events.
-In O-RAN Event consumer is a sidecar.
+In Cloud Native Events consumer is a sidecar.
 
 #### intermediary/sidecar
 
@@ -100,7 +100,7 @@ information.
 
 #### Event Format
 
-An Event Format specifies how to serialize a O-RAN Event as a sequence of bytes.
+An Event Format specifies how to serialize a Cloud Native Events as a sequence of bytes.
 Stand-alone event formats, such as the [JSON format](json-format.md), specify
 serialization independent of any protocol or storage medium. Protocol Bindings
 MAY define formats that are dependent on the protocol.
@@ -122,7 +122,7 @@ Messages can be delivered HTTP
 
 ## Context Attributes
 
-Every O-RAN Event conforming to this specification MUST include context
+Every Cloud Native Events conforming to this specification MUST include context
 attributes designated as REQUIRED, MAY include one or more OPTIONAL context
 attributes and MAY include one or more extension attributes.
 
@@ -132,10 +132,10 @@ inspected at the destination without having to deserialize the event data.
 
 ### Attribute Naming Convention
 
-The O-RAN Event specifications define mappings to various protocols and
-encodings, and the accompanying O-RAN Event SDK targets  only golang  for now.
+The Cloud Native Events specifications define mappings to various protocols and
+encodings, and the accompanying Cloud Native Events SDK targets  only golang  for now.
 
-O-RAN Event attribute names MUST consist of lower-case letters ('a' to 'z') or
+Cloud Native Events attribute names MUST consist of lower-case letters ('a' to 'z') or
 digits ('0' to '9') from the ASCII character set. Attribute names SHOULD be
 descriptive and terse and SHOULD NOT exceed 20 characters in length.
 
@@ -181,7 +181,7 @@ string-encoding for each type that MUST be supported by all implementations.
 All context attribute values MUST be of one of the types listed above.
 Attribute values MAY be presented as native types or canonical strings.
 
-A strongly-typed programming model that represents a O-RAN Event or any extension
+A strongly-typed programming model that represents a Cloud Native Events or any extension
 MUST be able to convert from and to the canonical string-encoding to the
 runtime/language native type that best corresponds to the abstract type.
 
@@ -205,7 +205,7 @@ within the same JSON object.
 
 ### REQUIRED Attributes
 
-The following attributes are REQUIRED to be present in all O-RAN Event:
+The following attributes are REQUIRED to be present in all Cloud Native Events:
 
 #### id
 
@@ -239,7 +239,7 @@ resource | The hierarchical name for the resource.  For this specification, the 
 #### specversion
 
 - Type: `String`
-- Description: The version of the O-RAN Event specification which the event
+- Description: The version of the Cloud Native Events specification which the event
   uses. This enables the interpretation of the context. Compliant event
   producers MUST use a value of `1.0` when referring to this version of the
   specification.
@@ -275,7 +275,7 @@ resource | The hierarchical name for the resource.  For this specification, the 
 - Type: `Timestamp`
 - Description: Timestamp of when the occurrence happened. If the time of the
   occurrence cannot be determined then this attribute MAY be set to some other
-  time (such as the current time) by the O-RAN Event producer, however all
+  time (such as the current time) by the Cloud Native Events producer, however all
   producers for the same `source` MUST be consistent in this respect. In other
   words, either they all use the actual time of the occurrence or they all use
   the same algorithm to determine the value used.
@@ -287,15 +287,15 @@ resource | The hierarchical name for the resource.  For this specification, the 
 
 ## Event Data
 
-As defined by the term [Data](#data), O-RAN Event data MAY include domain-specific
+As defined by the term [Data](#data), Cloud Native Events data MAY include domain-specific
 information about the occurrence based on enumeramtion type. When present, this information will be
 encapsulated within `data.value_type`.
 
 # Size Limits
 
-O-RAN Event will be forwarded through one or more generic
+Cloud Native Events will be forwarded through one or more generic
 intermediaries, each of which might impose limits on the size of forwarded
-events. The O-RAN Event is wrapped within the CloudEvents json objkect (See CloudEvents Spec here)
+events. The Cloud Native Events is wrapped within the CloudEvents json objkect (See CloudEvents Spec here)
 
 The "size" of an event is its wire-size and includes every bit that is
 transmitted on the wire for the event: protocol frame-metadata, event metadata,
@@ -307,7 +307,7 @@ different protocols or for events to be re-encoded, the least efficient
 protocol and encoding used by the application SHOULD be considered for
 compliance with these size constraints:
 
-- Intermediaries MUST?MAY wrap O-RAN Event wwithin CloudEvents object and forwarded data 
+- Intermediaries MUST?MAY wrap Cloud Native Events wwithin CloudEvents object and forwarded data 
    size shouldbe of 64 KByte or less.
 - Consumers SHOULD accept events of a size of at least 64 KByte.
 
@@ -317,7 +317,7 @@ be accepted and retransmitted by all intermediaries. It is in any particular
 consumer's control, whether it wants to accept or reject events of that size due
 to local considerations.
 
-Generally, O-RAN Event publishers SHOULD keep events compact by avoiding
+Generally, Cloud Native Events publishers SHOULD keep events compact by avoiding
 embedding large data items into event payloads and rather use the event payload
 to link to such data items. From an access control perspective, this approach
 also allows for a broader distribution of events, because accessing
@@ -353,7 +353,7 @@ The following example shows a O-RAN response to create subscription/publisher se
 }
 
 ```
-The following example shows a O-RAN Event serialized as JSON:
+The following example shows a Cloud Native Events serialized as JSON:
 ```JSON
 {
     "type" : "event.synchronization-state-change",
@@ -374,7 +374,7 @@ The following example shows a O-RAN Event serialized as JSON:
 
 # Example
 
-The following example shows a O-RAN Event embed in CloudEvents and serialized as JSON:
+The following example shows a Cloud Native Events embeded in CloudEvents and serialized as JSON:
 
 ```JSON
 {

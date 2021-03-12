@@ -1,8 +1,8 @@
-# JSON Event Format for O-RAN Event - Version 0.0.1
+# JSON Event Format for Cloud Native Events (CNE) - Version 0.0.1
 
 ## Abstract
 
-The JSON Format for O-RAN Event defines how events are expressed in JavaScript
+The JSON Format for Cloud Native Events defines how events are expressed in JavaScript
 Object Notation (JSON) Data Interchange Format ([RFC8259][rfc8259]).
 
 ## Table of Contents
@@ -13,10 +13,10 @@ Object Notation (JSON) Data Interchange Format ([RFC8259][rfc8259]).
 
 ## 1. Introduction
 
-[O-RAN Event][ce] is a standardized and protocol-agnostic definition of the
+[Cloud Native Events][ce] is a standardized and protocol-agnostic definition of the
 structure and metadata description of events for  cloud applications.
  This specification defines how the
-elements defined in the O-RAN Event specification are to be represented in the
+elements defined in the Cloud Native Events specification are to be represented in the
 JavaScript Object Notation (JSON) Data Interchange Format ([RFC8259][rfc8259]).
 
 
@@ -29,10 +29,10 @@ interpreted as described in [RFC2119][rfc2119].
 
 ### 2.2. Type System Mapping
 
-The [O-RAN Event type system][ce-types] MUST be mapped to JSON types as follows,
+The [Cloud Native Events type system][ce-types] MUST be mapped to JSON types as follows,
 with exceptions noted below.
 
-| CloudEvents   | JSON                                                           |
+| Cloud Native Events   | JSON                                                           |
 | ------------- | -------------------------------------------------------------- |
 | Boolean       | [boolean][json-bool]                                           |
 | Integer       | [number][json-number], only the `int` component is permitted   |
@@ -50,29 +50,28 @@ attributes they define, but MUST also include the previously defined primary
 mapping.
 
 For instance, the attribute value might be a data structure defined in a
-standard outside of O-RAN Event, with a formal JSON mapping, and there might be
+standard outside of Cloud Native Events, with a formal JSON mapping, and there might be
 risk of translation errors or information loss when the original format is not
 preserved.
 
 An extension specification that defines a secondary mapping rule for JSON, and
 any revision of such a specification, MUST also define explicit mapping rules
-for all other event formats that are part of the O-RAN Event core at the time of
+for all other event formats that are part of the Cloud Native Events core at the time of
 the submission or revision.
 
-If required, like when decoding Maps, the O-RAN Event type can be determined by
+If required, like when decoding Maps, the Cloud Native Events type can be determined by
 inference using the rules from the mapping table, whereby the only potentially
 ambiguous JSON data type is `string`. The value is compatible with the
-respective O-RAN Event type when the mapping rules are fulfilled.
+respective Cloud Native Events type when the mapping rules are fulfilled.
 
 ### 2.3. Examples
 
 The following table shows exemplary attribute mappings:
 
-| CloudEvents     | Type             | Exemplary JSON Value    |
+| Cloud Native Events     | Type             | Exemplary JSON Value    |
 | --------------- | ---------------- | ----------------------- |
 | type            | String           | "com.example.someevent" |
 | specversion     | String           | "1.0"                   |
-| source          | URI-reference    | "/mycontext"            |
 | id              | String           | "1234-1234-1234"        |
 | id              | String           | null        |
 | time            | Timestamp        | "2018-04-05T17:31:00Z"  |
@@ -81,111 +80,18 @@ The following table shows exemplary attribute mappings:
 
 ### 2.4. JSONSchema Validation
 
-The O-RAN event [JSONSchema](http://json-schema.org) for the spec is located
+The Cloud Native Events [JSONSchema](http://json-schema.org) for the spec is located
 [here](spec.json) and contains the definitions for validating events in JSON.
 
-## 3. Envelope
 
-Each O-RAN event can be wholly represented as a JSON object.
-
-Such a representation MUST use the media type `application/cloudevents+json`.
-
-All REQUIRED and all not omitted OPTIONAL attributes in the given event MUST
-become members of the JSON object, with the respective JSON object member name
-matching the attribute name, and the member's type and value being mapped using
-the [type system mapping](#22-type-system-mapping).
-
-OPTIONAL not omitted attributes MAY be represeted as a `null` JSON value.
-
-### 3.1. Handling of "data"
-
-Before taking action, a JSON serializer MUST first determine the runtime data
-type of the `data` content.
-
-The implementation MUST translate the data value into a
-[JSON value][json-value], 
-
-### 3.2. Examples
-
-
-```JSON
-{
-    "specversion" : "1.0",
-    "type" : "event.synchronization-state-change",
-    "time" : "2021-02-05T17:31:00Z",
-    "data" : { 
-     "version" : "1.0", 
-     "values" : [
-          { 
-            "type": "notification",
-            "resource" : "/sync/sync-status/sync-state",
-            "value_type" : "enumeration",
-            "value" : "HOLDOVER"
-          }
-    ]
-  }
-}
-```
-
-
-
-## 4. JSON Batch Format
-
-In the _JSON Batch Format_ several O-RAN event are batched into a single JSON
-document. The document is a JSON array filled with O-RAN event in the [JSON
-Event format][json-format].
-
-Although the _JSON Batch Format_ builds ontop of the _JSON Format_, it is
-considered as a separate format: a valid implementation of the _JSON Format_
-doesn't need to support it. The _JSON Batch Format_ MUST NOT be used when only
-support for the _JSON Format_ is indicated.
-
-### 4.1. Mapping O-RAN Event
-
-This section defines how a batch of O-RAN event is mapped to JSON.
-
-The outermost JSON element is a [JSON Array][json-array], which contains as
-elements O-RAN event rendered in accordance with the [JSON event
-format][json-format] specification.
-
-### 4.2. Envelope
-
-A JSON Batch of O-RAN event MUST use the media type
-`application/json`.
-
-### 4.3. Examples
-
-An example containing  O-RAN event: JSON data.
-
-```JSON
-
-    {
-    "specversion" : "1.0",
-    "type" : "event.synchronization-state-change",
-    "time" : "2021-02-05T17:31:00Z",
-    "data" : { 
-     "version" : "1.0", 
-     "values" : [
-          { 
-            "type": "notification",
-            "resource" : "/sync/sync-status/sync-state",
-            "value_type" : "enumeration",
-            "value" : "HOLDOVER"
-          }
-    ]
-  }
-}
- 
-```
-
-An example of an empty batch of O-RAN EVENT (typically used in a response, but
+An example of an empty batch of Cloud Native Events (typically used in a response, but
 also valid in a request):
 
 ```JSON
 []
 ```
 
-## 5. References
+## 3. References
 
 - [RFC2046][rfc2046] Multipurpose Internet Mail Extensions (MIME) Part Two:
   Media Types

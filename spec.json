@@ -120,7 +120,7 @@
             ]
         },
         "specversion": {
-            "description": "The version of the o-ran event specification which the event uses.",
+            "description": "The version of the cloud native events (CNE) specification which the event uses.",
             "$ref": "#/definitions/specversiondef",
             "examples": [
                 "1.0"
@@ -144,11 +144,11 @@
             "description": "The url location  to fetc subscription/producer information.",
             "$ref": "#/definitions/urilocationdef",
             "examples": [
-                "http://localhost:9090/api/oranevenet/subscription/789be75d-7ac3-472e-bbbc-6d62878aad4a"
+                "http://localhost:9090/api/cne/subscription/789be75d-7ac3-472e-bbbc-6d62878aad4a"
             ]
         },
         "type": {
-            "description": "Describes the type of o-ran event related to the originating occurrence.",
+            "description": "Describes the type of cloud native events (CNE) related to the originating occurrence.",
             "$ref": "#/definitions/typedef",
             "examples": [
                 "com.github.pull_request.opened",
@@ -171,21 +171,21 @@
                 "type": "object",
                 "properties": {
                     "version": {
-                        "description": "The version of the O-RAN Event specification which the event uses.",
+                        "description": "The version of the cloud native events (CNE) specification which the event uses.",
                         "$ref": "#/definitions/specversiondef",
                         "examples": [
                             "1.0"
                         ]
                     },
                     "resource": {
-                        "description": "The version of the O-RAN Event specification which the event uses.",
+                        "description": "The version of the cloud native events (CNE) specification which the event uses.",
                         "$ref": "#/definitions/resourcedef",
                         "examples": [
                             "/sync/sync-status/sync-state"
                         ]
                     },
                     "data_type": {
-                        "description": "The version of the O-RAN Event specification which the event uses.",
+                        "description": "The version of the cloud native events (CNE) specification which the event uses.",
                         "enum": [
                             "notification",
                             "metric"
@@ -196,7 +196,7 @@
                         "$ref": "#/definitions/valuetypedef"
                     },
                     "value": {
-                        "description": "The version of the O-RAN Event specification which the event uses.",
+                        "description": "The version of the cloud native events (CNE) specification which the event uses.",
                         "value_type": {
                             "anyOf": [
                                 {
