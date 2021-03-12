@@ -1,2 +1,2 @@
 # spec
-O-RAN Event Notification
+Cloud Native Events Notification
