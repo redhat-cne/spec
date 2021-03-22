@@ -7,16 +7,16 @@
             "type": "string",
             "minLength": 1
         },
+        "versiondef": {
+            "type": "string",
+            "minLength": 1
+        },  
         "timedef": {
             "type": [
                 "string",
                 "null"
             ],
             "format": "date-time",
-            "minLength": 1
-        },
-        "specversiondef": {
-            "type": "string",
             "minLength": 1
         },
         "typedef": {
@@ -32,22 +32,6 @@
                 "boolean",
                 "null"
             ]
-        },
-        "endpointuridef": {
-            "type": [
-                "string",
-                "null"
-            ],
-            "format": "uri-reference",
-            "minLength": 1
-        },
-        "urilocationdef": {
-            "type": [
-                "string",
-                "null"
-            ],
-            "format": "uri-reference",
-            "minLength": 1
         },
         "resourcedef": {
             "type": "string",
@@ -112,39 +96,11 @@
         }
     },
     "properties": {
-        "subscriptionid": {
+        "id": {
             "description": "Identifies the subscription and publisher.",
             "$ref": "#/definitions/iddef",
             "examples": [
                 "789be75d-7ac3-472e-bbbc-6d62878aad4a"
-            ]
-        },
-        "specversion": {
-            "description": "The version of the cloud native events (CNE) specification which the event uses.",
-            "$ref": "#/definitions/specversiondef",
-            "examples": [
-                "1.0"
-            ]
-        },
-        "resource": {
-            "description": "The resource address specifies the event producer with a hierarchical path.",
-            "$ref": "#/definitions/resourcedef",
-            "examples": [
-                "1.0"
-            ]
-        },
-        "endpointuri": {
-            "description": "Endpoint URI (a.k.a callback URI), e.g. http://localhost:8080/resourcestatus/ptp",
-            "$ref": "#/definitions/endpointuridef",
-            "examples": [
-                "http://localhost:8080/ptp/alert"
-            ]
-        },
-        "urilocation": {
-            "description": "The url location  to fetc subscription/producer information.",
-            "$ref": "#/definitions/urilocationdef",
-            "examples": [
-                "http://localhost:9090/api/cne/subscription/789be75d-7ac3-472e-bbbc-6d62878aad4a"
             ]
         },
         "type": {
@@ -163,6 +119,17 @@
             ]
         },
         "data": {
+            "description": "Define events",
+            "type": "object",
+            "properties": {
+                "version": {
+                    "description": "The version of the cloud native events (CNE) specification which the event uses.",
+                    "$ref": "#/definitions/versiondef",
+                    "examples": [
+                        "1.0"
+                    ]
+                },
+            "values": { 
             "description": "Array of JSON objects defining the information for the event.",
             "type": "array",
             "minItems": 1,
@@ -170,29 +137,22 @@
             "items": {
                 "type": "object",
                 "properties": {
-                    "version": {
-                        "description": "The version of the cloud native events (CNE) specification which the event uses.",
-                        "$ref": "#/definitions/specversiondef",
-                        "examples": [
-                            "1.0"
-                        ]
-                    },
                     "resource": {
-                        "description": "The version of the cloud native events (CNE) specification which the event uses.",
+                        "description": "Yang path to value specification .",
                         "$ref": "#/definitions/resourcedef",
                         "examples": [
                             "/sync/sync-status/sync-state"
                         ]
                     },
                     "data_type": {
-                        "description": "The version of the cloud native events (CNE) specification which the event uses.",
+                        "description": "Defines the event types as either notification or metric",
                         "enum": [
                             "notification",
                             "metric"
                         ]
                     },
                     "value_type": {
-                        "description": "The value type either enum or decimal.",
+                        "description": "The type format of the value property, either string or number format",
                         "$ref": "#/definitions/valuetypedef"
                     },
                     "value": {
@@ -239,14 +199,27 @@
                     }
                 },
                 "required": [
-                    "version",
-                    "data_type",
                     "resource",
+                    "data_type",
                     "value_type",
                     "value"
                 ],
                 "additionalProperties": false
             }
         }
-    }
+      },
+      "required": [
+        "version",
+        "values"
+    ],
+    "additionalProperties": false
+    } 
+},
+"required": [
+    "id",
+    "type",
+    "time",
+    "data"
+],
+"additionalProperties": false
 }

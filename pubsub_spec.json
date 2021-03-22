@@ -1,0 +1,78 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://example.com/product.schema.json",
+    "type": "object",
+    "definitions": {
+      "iddef": {
+        "type": "string",
+        "minLength": 1
+      },
+      "specversiondef": {
+        "type": "string",
+        "minLength": 1
+      },
+      "endpointuridef": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "uri-reference",
+        "minLength": 1
+      },
+      "urilocationdef": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "uri-reference",
+        "minLength": 1
+      },
+      "resourceaddressdef": {
+        "type": "string",
+        "pattern": "([^/]+(/{2,}[^/]+)?)",
+        "minLength": 1
+      }
+    },
+    "properties": {
+      "id": {
+        "description": "Identifies the subscription and publisher.",
+        "$ref": "#/definitions/iddef",
+        "examples": [
+          "789be75d-7ac3-472e-bbbc-6d62878aad4a"
+        ]
+      },
+      "specversion": {
+        "description": "The version of the cloud native events (CNE) specification which the event uses.",
+        "$ref": "#/definitions/specversiondef",
+        "examples": [
+          "1.0"
+        ]
+      },
+      "resourceaddress": {
+        "description": "The resource address specifies the event producer with a hierarchical path.",
+        "$ref": "#/definitions/resourceaddressdef",
+        "examples": [
+          "1.0"
+        ]
+      },
+      "endpointuri": {
+        "description": "Endpoint URI (a.k.a callback URI), e.g. http://localhost:8080/resourcestatus/ptp",
+        "$ref": "#/definitions/endpointuridef",
+        "examples": [
+          "http://localhost:8080/ptp/alert"
+        ]
+      },
+      "urilocation": {
+        "description": "The url location  to fetch subscription/producer information.",
+        "$ref": "#/definitions/urilocationdef",
+        "examples": [
+          "http://localhost:9090/api/cne/subscription/789be75d-7ac3-472e-bbbc-6d62878aad4a"
+        ]
+      }
+    },
+    "required": [
+      "resourceaddress",
+      "endpointuri"
+    ],
+    "additionalProperties": false
+  }
