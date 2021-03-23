@@ -1,225 +1,216 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema",
+    "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "https://example.com/product.schema.json",
     "type": "object",
     "definitions": {
-        "iddef": {
-            "type": "string",
-            "minLength": 1
+      "iddef": {
+        "type": "string",
+        "minLength": 1
+      },
+      "versiondef": {
+        "type": "string",
+        "minLength": 1
+      },
+      "timedef": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time",
+        "minLength": 1
+      },
+      "typedef": {
+        "type": "string",
+        "minLength": 1
+      },
+      "datadef": {
+        "type": [
+          "object",
+          "string",
+          "number",
+          "array",
+          "boolean",
+          "null"
+        ]
+      },
+      "resourcedef": {
+        "type": "string",
+        "pattern": "([^/]+(/{2,}[^/]+)?)",
+        "minLength": 1
+      },
+      "valuetypedef": {
+        "enum": [
+          "enumeration",
+          "decimal64.3"
+        ]
+      },
+      "ptp-sync-state": {
+        "enum": [
+          "LOCKED",
+          "HOLDOVER",
+          "FREERUN"
+        ]
+      },
+      "os-clock-sync-state": {
+        "enum": [
+          "LOCKED",
+          "HOLDOVER",
+          "FREERUN"
+        ]
+      },
+      "syncee-lock-state": {
+        "enum": [
+          "LOCKED",
+          "UNLOCKED"
+        ]
+      },
+      "gnss-sync-state": {
+        "enum": [
+          "SYNCHRONIZED",
+          "ACQUIRING-SYNC",
+          "ANTENNA-DISCONNECTED",
+          "BOOTING",
+          "ANTENNA-SHORT_CIRCUIT"
+        ]
+      },
+      "decimaldef": {
+        "type": "number"
+      },
+      "datatypedef": {
+        "enum": [
+          "notification",
+          "metric"
+        ]
+      },
+      "valuedef": {
+        "value": {
+          "description": "The version of the cloud native events (CNE) specification which the event uses."
         },
-        "versiondef": {
-            "type": "string",
-            "minLength": 1
-        },  
-        "timedef": {
-            "type": [
-                "string",
-                "null"
-            ],
-            "format": "date-time",
-            "minLength": 1
-        },
-        "typedef": {
-            "type": "string",
-            "minLength": 1
-        },
-        "datadef": {
-            "type": [
-                "object",
-                "string",
-                "number",
-                "array",
-                "boolean",
-                "null"
-            ]
-        },
-        "resourcedef": {
-            "type": "string",
-            "pattern": "([^\/]+(\/{2,}[^\/]+)?)",
-            "minLength": 1
-        },
-        "valuetypedef": {
-            "value_type": {
-                "additionalProperties": false,
-                "enum": [
-                    "enumeration",
-                    "decimal64.3"
-                ]
+        "anyOf": [
+          {
+            "if": {
+              "properties": {
+                "data_type": {
+                  "const": "notification"
+                }
+              }
+            },
+            "then": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/ptp-sync-state"
+                },
+                {
+                  "$ref": "#/definitions/os-clock-sync-state"
+                },
+                {
+                  "$ref": "#/definitions/syncee-lock-state"
+                },
+                {
+                  "$ref": "#/definitions/gnss-sync-state"
+                }
+              ]
             }
-        },
-        "ptp-sync-state": {
-            "value": {
-                "additionalProperties": false,
-                "enum": [
-                    "LOCKED",
-                    "HOLDOVER",
-                    "FREERUN"
-                ]
+          },
+          {
+            "if": {
+              "properties": {
+                "data_type": {
+                  "const": "metric"
+                }
+              }
+            },
+            "then": {
+              "$ref": "#/definitions/decimaldef"
             }
-        },
-        "os-clock-sync-state": {
-            "value": {
-                "additionalProperties": false,
-                "enum": [
-                    "LOCKED",
-                    "HOLDOVER",
-                    "FREERUN"
-                ]
-            }
-        },
-        "syncee-lock-state": {
-            "value": {
-                "additionalProperties": false,
-                "enum": [
-                    "LOCKED",
-                    "UNLOCKED"
-                ]
-            }
-        },
-        "gnss-sync-state": {
-            "value": {
-                "additionalProperties": false,
-                "enum": [
-                    "SYNCHRONIZED",
-                    "ACQUIRING-SYNC",
-                    "ANTENNA-DISCONNECTED",
-                    "BOOTING",
-                    "ANTENNA-SHORT_CIRCUIT"
-                ]
-            }
-        },
-        "decimaldef": {
-            "value": {
-                "additionalProperties": false,
-                "type": "number"
-            }
-        }
+          }
+        ]
+      }
     },
     "properties": {
-        "id": {
-            "description": "Identifies the subscription and publisher.",
-            "$ref": "#/definitions/iddef",
+      "id": {
+        "description": "Identifies the subscription and publisher.",
+        "$ref": "#/definitions/iddef",
+        "examples": [
+          "789be75d-7ac3-472e-bbbc-6d62878aad4a"
+        ]
+      },
+      "type": {
+        "description": "Describes the type of cloud native events (CNE) related to the originating occurrence.",
+        "$ref": "#/definitions/typedef",
+        "examples": [
+          "com.github.pull_request.opened",
+          "com.example.object.deleted.v2"
+        ]
+      },
+      "time": {
+        "description": "Timestamp of when the occurrence happened. Must adhere to RFC 3339.",
+        "$ref": "#/definitions/timedef",
+        "examples": [
+          "2018-04-05T17:31:00Z"
+        ]
+      },
+      "data": {
+        "description": "Define events",
+        "type": "object",
+        "properties": {
+          "version": {
+            "description": "The version of the cloud native events (CNE) specification which the event uses.",
+            "$ref": "#/definitions/versiondef",
             "examples": [
-                "789be75d-7ac3-472e-bbbc-6d62878aad4a"
+              "1.0"
             ]
-        },
-        "type": {
-            "description": "Describes the type of cloud native events (CNE) related to the originating occurrence.",
-            "$ref": "#/definitions/typedef",
-            "examples": [
-                "com.github.pull_request.opened",
-                "com.example.object.deleted.v2"
-            ]
-        },
-        "time": {
-            "description": "Timestamp of when the occurrence happened. Must adhere to RFC 3339.",
-            "$ref": "#/definitions/timedef",
-            "examples": [
-                "2018-04-05T17:31:00Z"
-            ]
-        },
-        "data": {
-            "description": "Define events",
-            "type": "object",
-            "properties": {
-                "version": {
-                    "description": "The version of the cloud native events (CNE) specification which the event uses.",
-                    "$ref": "#/definitions/versiondef",
-                    "examples": [
-                        "1.0"
-                    ]
-                },
-            "values": { 
+          },
+          "values": {
             "description": "Array of JSON objects defining the information for the event.",
             "type": "array",
             "minItems": 1,
             "additionalItems": false,
             "items": {
-                "type": "object",
-                "properties": {
-                    "resource": {
-                        "description": "Yang path to value specification .",
-                        "$ref": "#/definitions/resourcedef",
-                        "examples": [
-                            "/sync/sync-status/sync-state"
-                        ]
-                    },
-                    "data_type": {
-                        "description": "Defines the event types as either notification or metric",
-                        "enum": [
-                            "notification",
-                            "metric"
-                        ]
-                    },
-                    "value_type": {
-                        "description": "The type format of the value property, either string or number format",
-                        "$ref": "#/definitions/valuetypedef"
-                    },
-                    "value": {
-                        "description": "The version of the cloud native events (CNE) specification which the event uses.",
-                        "value_type": {
-                            "anyOf": [
-                                {
-                                    "properties": {
-                                        "data_type": {
-                                            "const": "notification"
-                                        },
-                                        "value": {
-                                            "const": "enumeration"
-                                        }
-                                    },
-                                    "anyOf": [
-                                        {
-                                            "$ref": "#/definitions/ptp-sync-state"
-                                        },
-                                        {
-                                            "$ref": "#/definitions/os-clock-sync-state"
-                                        },
-                                        {
-                                            "$ref": "#/definitions/syncee-lock-state"
-                                        },
-                                        {
-                                            "$ref": "#/definitions/gnss-sync-state"
-                                        }
-                                    ]
-                                },
-                                {
-                                    "properties": {
-                                        "data_type": {
-                                            "const": "metric"
-                                        },
-                                        "value": {
-                                            "const": "decimal64.3"
-                                        }
-                                    },
-                                    "$ref": "#/definitions/decimaldef"
-                                }
-                            ]
-                        }
-                    }
+              "type": "object",
+              "properties": {
+                "resource": {
+                  "description": "Yang path to value specification .",
+                  "$ref": "#/definitions/resourcedef",
+                  "examples": [
+                    "/sync/sync-status/sync-state"
+                  ]
                 },
-                "required": [
-                    "resource",
-                    "data_type",
-                    "value_type",
-                    "value"
-                ],
-                "additionalProperties": false
+                "data_type": {
+                  "description": "Defines the event types as either notification or metric",
+                  "$ref": "#/definitions/datatypedef"
+                },
+                "value_type": {
+                  "description": "The type format of the value property, either string or number format",
+                  "$ref": "#/definitions/valuetypedef"
+                },
+                "value": {
+                  "description": "The version of the cloud native events (CNE) specification which the event uses.",
+                  "$ref": "#/definitions/valuedef"
+                }
+              },
+              "required": [
+                "resource",
+                "data_type",
+                "value_type",
+                "value"
+              ],
+              "additionalProperties": false
             }
-        }
-      },
-      "required": [
-        "version",
-        "values"
+          }
+        },
+        "required": [
+          "version",
+          "values"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "required": [
+      "id",
+      "type",
+      "time",
+      "data"
     ],
     "additionalProperties": false
-    } 
-},
-"required": [
-    "id",
-    "type",
-    "time",
-    "data"
-],
-"additionalProperties": false
-}
+  }
