@@ -83,10 +83,24 @@
         ]
       },
       "valuedef": {
-        "value": {
-          "description": "The version of the cloud native events (CNE) specification which the event uses."
-        },
-        "anyOf": [
+        "type": [
+          "string",
+          "number",
+          "integer"
+        ],
+        "oneOf": [
+          {
+            "if": {
+              "properties": {
+                "data_type": {
+                  "const": "metric"
+                }
+              }
+            },
+            "then": {
+              "$ref": "#/definitions/decimaldef"
+            }
+          },
           {
             "if": {
               "properties": {
@@ -110,18 +124,6 @@
                   "$ref": "#/definitions/gnss-sync-state"
                 }
               ]
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "data_type": {
-                  "const": "metric"
-                }
-              }
-            },
-            "then": {
-              "$ref": "#/definitions/decimaldef"
             }
           }
         ]
