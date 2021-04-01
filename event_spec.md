@@ -9,14 +9,11 @@ data.
 
 - [Overview](#overview)
 - [Notations and Terminology](#notations-and-terminology)
-- [Context Attributes](#context-attributes)
 - [Event Data](#event-data)
 - [Size Limits](#size-limits)
-- [Privacy & Security](#privacy-and-security)
 - [Example](#example)
 
 ## Overview
-
 
 
 ## Notations and Terminology
@@ -54,10 +51,10 @@ perform a scheduled reboot.
 An "event" is a data record expressing an occurrence and its context. Events are
 routed from an event producer (the source) to interested event consumers. The
 routing can be performed based on information contained in the event, but an
-event will not identify a specific routing destination. Events will contain two
-types of information: the [Event Data](#event-data) representing the Occurrence
-and [Context](#context) metadata providing contextual information about the
-Occurrence. A single occurrence MAY result in more than one event.
+event will not identify a specific routing destination. Events will contain 
+the [Event Data](#event-data) representing the Occurrence
+and providing contextual information about the Occurrence. 
+A single occurrence MAY result in more than one event.
 
 #### Producer
 
@@ -70,6 +67,10 @@ The "source" is the context in which the occurrence happened. In a distributed
 system it might consist of multiple [Producers](#producer). If a source is not
 aware of Cloud Native Events, an external producer creates the Cloud Native Events on behalf of
 the source.
+
+
+#### Context
+Context metadata will be encapsulated in the event as resource address. 
 
 #### Consumer
 
@@ -84,12 +85,6 @@ forwarding it to the next receiver, which might be another intermediary/sidecar 
 [Consumer](#consumer). A typical task for an intermediary is to route the event
 to receivers based on the information in the [Context](#context).
 
-#### Context
-
-Context metadata will be encapsulated in the
-[Context Attributes](#context-attributes). Tools and application code can use
-this information to identify the relationship of Events to aspects of the system
-or to other Events.
 
 #### Data
 
@@ -116,28 +111,7 @@ A "binary-mode message" is one where the event data is stored in the message
 body, and event attributes are stored as part of message meta-data.
 
 #### Protocol
-
-Messages can be delivered HTTP
-
-
-## Context Attributes
-
-Every Cloud Native Events conforming to this specification MUST include context
-attributes designated as REQUIRED, MAY include one or more OPTIONAL context
-attributes and MAY include one or more extension attributes.
-
-These attributes, while descriptive of the event, are designed such that they
-can be serialized independent of the event data. This allows for them to be
-inspected at the destination without having to deserialize the event data.
-
-### Attribute Naming Convention
-
-The Cloud Native Events specifications define mappings to various protocols and
-encodings, and the accompanying Cloud Native Events SDK targets  only golang  for now.
-
-Cloud Native Events attribute names MUST consist of lower-case letters ('a' to 'z') or
-digits ('0' to '9') from the ASCII character set. Attribute names SHOULD be
-descriptive and terse and SHOULD NOT exceed 20 characters in length.
+Messages can be delivered HTTP 
 
 ### Type System
 
@@ -168,18 +142,10 @@ string-encoding for each type that MUST be supported by all implementations.
 - `Binary` - Sequence of bytes.
   - String encoding: Base64 encoding per
     [RFC4648](https://tools.ietf.org/html/rfc4648).
-- `EndpointUri` - Absolute uniform resource identifier.
-  - String encoding: `Absolute URI` as defined in
-    [RFC 3986 Section 4.3](https://tools.ietf.org/html/rfc3986#section-4.3).
-- `UriLocation` - Absolute uniform resource identifier.
-  - String encoding: `Absolute URI` as defined in
-    [RFC 3986 Section 4.3](https://tools.ietf.org/html/rfc3986#section-4.3).
 - `Timestamp` - Date and time expression using the Gregorian Calendar.
   - String encoding: [RFC 3339](https://tools.ietf.org/html/rfc3339).
 
 
-All context attribute values MUST be of one of the types listed above.
-Attribute values MAY be presented as native types or canonical strings.
 
 A strongly-typed programming model that represents a Cloud Native Events or any extension
 MUST be able to convert from and to the canonical string-encoding to the
@@ -197,11 +163,6 @@ the producer and ultimate consumer. The `Timestamp` might also be routed as a
 native protocol type and might be mapped to/from the respective
 language/runtime types at the producer and consumer ends, and never materialize
 as a string.
-
-The choice of serialization mechanism will determine how the context attributes
-and the event data will be serialized. For example, in the case of a JSON
-serialization, the context attributes and the event data might both appear
-within the same JSON object.
 
 ### REQUIRED Attributes
 
@@ -222,18 +183,20 @@ The following attributes are REQUIRED to be present in all Cloud Native Events:
   - An event counter maintained by the producer
   - A UUID
 
-#### resourceaddress
-The format of the resource address is shown in Table 1.1.3.2-2.  The resource address specifies the event producer with a hierarchical path.  The path format provides the ability for management and monitoring to extend beyond a single cluster and node.  
+#### type
 
-/{clusterName}/{siteName}/{nodeName}/{resource}
-Field definitions are shown in Table 1.1.32-2.
+- Type: `String`
+- Description: This attribute contains a value describing the type of event
+  related to the originating occurrence. Often this attribute is used for
+  routing, observability, policy enforcement, etc.
 
-Address Component |  Description |  Example |
---- | --- | --- |
-clusterName | The name of the cloud where the producer exists.  A ‘.’ can be used to indicate the cluster where the consumer exists. | eastern-edge  | 
-siteName | The name of the site containing the node(s) that the event producer is located in. A regular expression with * or . may be specified to subscribe to multiple sites.  | cellsite16385  |
-nodeName  | Name of the Worker node or Compute node where the producer exists.  The name must map to the nomenclature in use for the underlying cloud infrastructure.  A regular expression with * or . may be specified to subscribe to multiple nodes. | node27 or node* -> all nodes | 
-resource | The hierarchical name for the resource.  For this specification, the resource hierarchy will align with the yang models specified in O-RAN.WG4.MP-Yangs-v05.00 to the extent possible.  A * may be specified in the address hierarchy to subscribe to events below the specified level.| ../o-ran-sync/sync-group/sync-status/sync-state , ../o-ran-sync/sync-group/*| 
+- Constraints:
+  - REQUIRED
+  - MUST be a non-empty string
+  - SHOULD be prefixed with a reverse-DNS name. The prefixed domain dictates the
+    organization which defines the semantics of this event type.
+- Examples
+  - cevent.synchronization-state-change
 
 
 #### specversion
@@ -253,22 +216,6 @@ resource | The hierarchical name for the resource.  For this specification, the 
 - Constraints:
   - REQUIRED
   - MUST be a non-empty string
-
-#### type
-
-- Type: `String`
-- Description: This attribute contains a value describing the type of event
-  related to the originating occurrence. Often this attribute is used for
-  routing, observability, policy enforcement, etc.
-
-- Constraints:
-  - REQUIRED
-  - MUST be a non-empty string
-  - SHOULD be prefixed with a reverse-DNS name. The prefixed domain dictates the
-    organization which defines the semantics of this event type.
-- Examples
-  - cevent.synchronization-state-change
-
 
 #### time
 
@@ -290,6 +237,48 @@ resource | The hierarchical name for the resource.  For this specification, the 
 As defined by the term [Data](#data), Cloud Native Events data MAY include domain-specific
 information about the occurrence based on enumeramtion type. When present, this information will be
 encapsulated within `data.value_type`.
+
+### Values
+Values represent array of event types that occured for a given occurance of ecent 
+[{data_type:"[data_type](#data_type)"}, "resource":[resource](#resouorce)],"[value_type](#value_type)","[value](#value)}]
+
+“data_type”: “notification”
+              “resource” : “/sync/sync-status/sync-state”,
+               “value_type” : “enumeration”,
+               "value" : ”HOLDOVER"
+
+
+#### data_type
+Defines tthe event types . This can be of two types.
+-`notification`
+  Notificatuion types defines the event data is of type notification of event occured.
+- `metric`
+   metric are time-series data in decimal format.
+
+#### resource
+Yang path to value specification.
+The format of the resource address is shown in Table 1.1.3.2-2.  The resource address specifies the event producer with a hierarchical path.  The path format provides the ability for management and monitoring to extend beyond a single cluster and node.  
+
+/{clusterName}/{siteName}/{nodeName}/{resource}
+Field definitions are shown in Table 1.1.32-2.
+
+Address Component |  Description |  Example |
+--- | --- | --- |
+clusterName | The name of the cloud where the producer exists.  A ‘.’ can be used to indicate the cluster where the consumer exists. | eastern-edge  | 
+siteName | The name of the site containing the node(s) that the event producer is located in. A regular expression with * or . may be specified to subscribe to multiple sites.  | cellsite16385  |
+nodeName  | Name of the Worker node or Compute node where the producer exists.  The name must map to the nomenclature in use for the underlying cloud infrastructure.  A regular expression with * or . may be specified to subscribe to multiple nodes. | node27 or node* -> all nodes | 
+resource | The hierarchical name for the resource.  For this specification, the resource hierarchy will align with the yang models specified in O-RAN.WG4.MP-Yangs-v05.00 to the extent possible.  A * may be specified in the address hierarchy to subscribe to events below the specified level.| ../o-ran-sync/sync-group/sync-status/sync-state , ../o-ran-sync/sync-group/*| 
+
+
+### value_type
+- `value_type`
+    The type format of the [`value`](#value) property.
+
+
+### value
+- `value`
+  String representation of value in value_type format
+
 
 # Size Limits
 
@@ -325,80 +314,69 @@ event-related details through resolving links allows for differentiated access
 control and selective disclosure, rather than having sensitive details embedded
 in the event directly.
 
-# Privacy and Security
+
+
 
 # Example
 
-The following example shows a O-RAN request to create subscription/publisher serialized as JSON:
 
-```JSON
-{
-    "specversion" : "1.0",
-    "subscriptionid": "",
-    "resource" : "/sync/sync-status/sync-state",
-    "endpointuri": "http://localhost:8080/event/alert",
-    "urilocation": "",
-    "data" : {}
-}
-The following example shows a O-RAN response to create subscription/publisher serialized as JSON:
-
-```JSON
-{
-    "specversion" : "1.0",
-    "subscriptionid": "789be75d-7ac3-472e-bbbc-6d62878aad4a",
-    "resource" : "/sync/sync-status/sync-state",
-    "endpointuri": "http://localhost:8080/event/alert",
-    "urilocation": "http://localhost:9090/api/oranevenet/subscription/789be75d-7ac3-472e-bbbc-6d62878aad4a",
-    "data" : {}
-}
-
-```
 The following example shows a Cloud Native Events serialized as JSON:
+(Following json should be validated with Cloud native events event_spec.json schema)
+
+
 ```JSON
 {
-    "type" : "event.synchronization-state-change",
-    "time" : "2021-02-05T17:31:00Z",
-    "data" : { 
-    "version" : "1.0", 
-    "values" : [
-          { 
-            "type": "notification",
-            "resource" : "/sync/sync-status/sync-state",
-            "value_type" : "enumeration",
-            "value" : "HOLDOVER"
-          }
-    ]
-  }
+
+    "id": "5ce55d17-9234-4fee-a589-d0f10cb32b8e",
+    "type": "event.synchronization-state-chang",
+    "time": "2021-02-05T17:31:00Z",
+    "data": {
+    "version": "v1.0",
+    "values": [{
+        "resource": "/cluster/node/ptp", 
+        "data_type": "notification",
+        "value_type": "enumeration",
+        "value": "ACQUIRING-SYNC"
+    }, {
+
+        "resource": "/cluster/node/clock",
+        "data_type": "metric",
+        "value_type": "decimal64.3",
+        "value": 100.3
+    }]
+    }
 }
+
 ```
 
 # Example
 
 The following example shows a Cloud Native Events embeded in CloudEvents and serialized as JSON:
+(Following json should be validated with CloudEvents scheam at https://github.com/cloudevents/spec/blob/v1.0.1/spec.json)
 
 ```JSON
 {
-
-    "type" : "event.synchronization-state-change",
-    "source" : "https://localhost:9090/subscription/33-3123-213-31-3",
-    "subject" : "123",
-    "id" : "A234-1234-1234",
-    "time" : "2021-02-05T17:31:00Z",
-    "datacontenttype" : "text/xml",
-    "data" : {
-    "specversion" : "1.0",
-    "type" : "event.synchronization-state-change",
-    "time" : "2021-02-05T17:31:00Z",
-    "datacontenttype" : "text/xml",
-    "data" : { 
-     "version" : "1.0", 
-     "values" : [
-          { 
-            "type": "notification",
-            "resource" : "/sync/sync-status/sync-state",
-            "value_type" : "enumeration",
-            "value" : "HOLDOVER"
-          }
+  "type": "event.synchronization-state-change",
+  "source": "/cluster/node/ptp",
+  "id": "789be75d-7ac3-472e-bbbc-6d62878aad4a",
+  "time": "2021-02-05T17:31:00Z",
+  "datacontenttype": "application/json",
+  "specversion": "v1.0",
+  "data": {
+    "version": "1.0",
+    "values": [
+      {
+        "type": "notification",
+        "resource": "/sync/sync-status/sync-state",
+        "value_type": "enumeration",
+        "value": "HOLDOVER"
+      },
+      {
+        "type": "notification",
+        "resource": "/sync/sync-status/sync-state",
+        "value_type": "enumeration",
+        "value": "HOLDOVER"
+      }
     ]
   }
 }
