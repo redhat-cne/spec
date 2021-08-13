@@ -234,7 +234,7 @@ This is defined in the next section.
 
 ## Event Data
 
-Cloud Native Events data includes a version number and a generic `Values` field or a Redfish hardware specific `Data`field.
+Cloud Native Events data includes a version number and a generic `Values` field or a Redfish hardware specific `Data` field.
 As defined by the term Data, Cloud Native Events data MAY include domain-specific
 information about the occurrence based on enumeramtion type. When present, this information will be
 encapsulated within `data.value_type`.
@@ -569,6 +569,48 @@ The following example shows a Cloud Native Events embeded in CloudEvents and ser
         "value": "HOLDOVER"
       }
     ]
+  }
+}
+```
+
+### Cloud Events with Redfish hardware event data
+The following example shows a Cloud Native Events with Redfish hardware event data embeded in CloudEvents and serialized as JSON:
+(Following json should be validated with CloudEvents scheam at https://github.com/cloudevents/spec/blob/v1.0.1/spec.json)
+
+```JSON
+{
+  "type": "HW_EVENT",
+  "source": "/cluster/node/mynode/redfish/event",
+  "id": "789be75d-7ac3-472e-bbbc-6d62878aad4a",
+  "time": "2021-08-09T18:29:51.187379474Z",
+  "datacontenttype": "application/json",
+  "specversion": "v1.0",
+  "data": {
+    "version": "v1.0",
+    "data": {
+      "@odata.context": "/redfish/v1/$metadata#Event.Event",
+      "@odata.id": "/redfish/v1/EventService/Events/5e004f5a-e3d1-11eb-ae9c-3448edf18a38",
+      "@odata.type": "#Event.v1_3_0.Event",
+      "Context": "any string is valid",
+      "Events": [
+        {
+          "Context": "any string is valid",
+          "EventId": "2162",
+          "EventTimestamp": "2021-07-13T15:07:59+0300",
+          "EventType": "Alert",
+          "MemberId": "615703",
+          "Message": "The system board Inlet temperature is less than the lower warning threshold.",
+          "MessageArgs": [
+            "Inlet"
+          ],
+          "MessageArgs@odata.count": 1,
+          "MessageId": "TMP0100",
+          "Severity": "Warning"
+        }
+      ],
+      "Id": "5e004f5a-e3d1-11eb-ae9c-3448edf18a38",
+      "Name": "Event Array"
+    }
   }
 }
 ```
