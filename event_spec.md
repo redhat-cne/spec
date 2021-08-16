@@ -1,4 +1,4 @@
-# Cloud Native Events (CNE)- Version 0.0.1
+# Cloud Native Events (CNE)- Version 0.1.0
 
 ## Abstract
 
@@ -9,6 +9,8 @@ data.
 
 - [Overview](#overview)
 - [Notations and Terminology](#notations-and-terminology)
+- [Type System](#type-system)
+- [REQUIRED Attributes](#required-attributes)
 - [Event Data](#event-data)
 - [Size Limits](#size-limits)
 - [Example](#example)
@@ -113,7 +115,7 @@ body, and event attributes are stored as part of message meta-data.
 #### Protocol
 Messages can be delivered HTTP 
 
-### Type System
+## Type System
 
 The following abstract data types are available for use in attributes. Each of
 these types MAY be represented differently by different event formats and in
@@ -164,11 +166,11 @@ native protocol type and might be mapped to/from the respective
 language/runtime types at the producer and consumer ends, and never materialize
 as a string.
 
-### REQUIRED Attributes
+## REQUIRED Attributes
 
 The following attributes are REQUIRED to be present in all Cloud Native Events:
 
-#### id
+### id
 
 - Type: `String`
 - Description: Identifies the event. Producers MUST ensure that `source` + `id`
@@ -183,7 +185,7 @@ The following attributes are REQUIRED to be present in all Cloud Native Events:
   - An event counter maintained by the producer
   - A UUID
 
-#### type
+### type
 
 - Type: `String`
 - Description: This attribute contains a value describing the type of event
@@ -198,8 +200,46 @@ The following attributes are REQUIRED to be present in all Cloud Native Events:
 - Examples
   - cevent.synchronization-state-change
 
+### dataContentType
 
-#### specversion
+- Type: `String`
+- Description: This attribute contains a value describing the content type
+  of the event data.
+
+- Constraints:
+  - REQUIRED
+  - MUST be a non-empty string
+- Examples
+  - application/json
+
+
+### time
+
+- Type: `Timestamp`
+- Description: Timestamp of when the occurrence happened. If the time of the
+  occurrence cannot be determined then this attribute MAY be set to some other
+  time (such as the current time) by the Cloud Native Events producer, however all
+  producers for the same `source` MUST be consistent in this respect. In other
+  words, either they all use the actual time of the occurrence or they all use
+  the same algorithm to determine the value used.
+- Constraints:
+  - OPTIONAL
+  - If present, MUST adhere to the format specified in
+    [RFC 3339](https://tools.ietf.org/html/rfc3339)
+
+
+### data
+
+This is defined in the next section.
+
+## Event Data
+
+Cloud Native Events data includes a version number and a generic `Values` field or a Redfish hardware specific `Data` field.
+As defined by the term Data, Cloud Native Events data MAY include domain-specific
+information about the occurrence based on enumeramtion type. When present, this information will be
+encapsulated within `data.value_type`.
+
+### version
 
 - Type: `String`
 - Description: The version of the Cloud Native Events specification which the event
@@ -217,29 +257,8 @@ The following attributes are REQUIRED to be present in all Cloud Native Events:
   - REQUIRED
   - MUST be a non-empty string
 
-#### time
-
-- Type: `Timestamp`
-- Description: Timestamp of when the occurrence happened. If the time of the
-  occurrence cannot be determined then this attribute MAY be set to some other
-  time (such as the current time) by the Cloud Native Events producer, however all
-  producers for the same `source` MUST be consistent in this respect. In other
-  words, either they all use the actual time of the occurrence or they all use
-  the same algorithm to determine the value used.
-- Constraints:
-  - OPTIONAL
-  - If present, MUST adhere to the format specified in
-    [RFC 3339](https://tools.ietf.org/html/rfc3339)
-
-
-## Event Data
-
-As defined by the term [Data](#data), Cloud Native Events data MAY include domain-specific
-information about the occurrence based on enumeramtion type. When present, this information will be
-encapsulated within `data.value_type`.
-
 ### Values
-Values represent array of event types that occured for a given occurance of ecent 
+Values represent array of event types that occured for a given occurance of event 
 [{data_type:"[data_type](#data_type)"}, "resource":[resource](#resouorce)],"[value_type](#value_type)","[value](#value)}]
 
 “data_type”: “notification”
@@ -270,17 +289,154 @@ nodeName  | Name of the Worker node or Compute node where the producer exists.  
 resource | The hierarchical name for the resource.  For this specification, the resource hierarchy will align with the yang models specified in O-RAN.WG4.MP-Yangs-v05.00 to the extent possible.  A * may be specified in the address hierarchy to subscribe to events below the specified level.| ../o-ran-sync/sync-group/sync-status/sync-state , ../o-ran-sync/sync-group/*| 
 
 
-### value_type
+#### value_type
 - `value_type`
     The type format of the [`value`](#value) property.
 
 
-### value
+#### value
 - `value`
   String representation of value in value_type format
 
+### Data
+Data represents a Redfish Event as defined in Redfish schema
+ [Event.v1_4_1.json](https://redfish.dmtf.org/schemas/v1/Event.v1_4_1.json).
+The Event schema describes the JSON payload received by an Event Destination,
+which has subscribed to event notification, when events occur.  This Resource
+contains data about events, including descriptions, severity, and a MessageId
+link to a Message Registry that can be accessed for further information.
 
-# Size Limits
+#### REQUIRED Attributes
+
+The following attributes are REQUIRED to be present in the `Data` property.
+
+- `@odata.type`
+	The type of a resource.
+  - Type: `String`
+
+- `Events`
+	Array of event records with type `EventRecord`.
+  - Type: array of `EventRecord`
+
+- `Id`
+	ID of the event.
+  - Type: `String`
+
+- `Name`
+  Name of event.
+  - Type: `String`
+
+#### OPTIONAL Attributes
+
+The following attributes are OPTIONAL to be present in the `Data` property.
+
+- `@odata.context`
+  The OData description of a payload. 
+  - Type: `String`
+
+- `Actions`
+  The available actions for this resource.
+  - Type: `Binary`.
+
+- `Context`
+   A context can be supplied at subscription time.  This property is the
+   context value supplied by the subscriber.
+  - Type: `String`
+
+- `Description`
+  The description of this resource. Used for commonality in the schema definitions.
+  - Type: `String`
+
+- `Oem`
+  This is the manufacturer/provider specific extension.
+  - Type: `Binary`
+
+#### EventRecord
+EventRecord is defined in Redfish schema
+[Event_v1_4_1_EventRecord](https://redfish.dmtf.org/schemas/v1/Event.v1_4_1.json).
+Additional information returned from Message Registry is added from
+[Message.v1_0_8](https://redfish.dmtf.org/schemas/v1/Message.v1_0_8.json).
+
+
+##### REQUIRED Attributes
+
+The following attributes are REQUIRED to be present in the `EventRecord` property.
+
+- `EventType`
+	This indicates the type of event sent, according to the definitions in the EventService.
+ 
+- `MessageId`
+	This property shall be a key into message registry as described in the Redfish specification.
+
+- `MemberId`
+	 This is the identifier for the member within the collection.
+
+
+##### OPTIONAL Attributes
+
+The following attributes are OPTIONAL to be present in the `EventRecord` property.
+
+- `Actions`
+  The available actions for this resource.
+  - Type: `Binary`.
+
+- `Context`
+   This property has been Deprecated in favor of Context found at the root level of the object.
+  - Type: `String`
+
+- `EventGroupId`
+  This value is the identifier used to correlate events that came from the same cause.
+  - Type: `Int`
+
+- `EventId`
+  The value of this property shall indicate a unique identifier for the event.
+  - Type: `String`
+
+- `EventTimestamp`
+  This is time the event occurred.
+  - Type: `String`.
+
+- `Message`
+  Full message of the event.
+  - Type: `String`
+
+- `Message`
+  Message of the event.
+  - Type: `String`
+
+- `Message`
+  This property shall contain an optional human readable message.
+  - Type: `String`
+
+- `MessageArgs`
+  This array of message arguments are substituted for the arguments
+	in the message when looked up in the message registry.
+  - Type: array of `String`
+
+- `MessageId`
+  This property shall be a key into message registry as described in the Redfish specification.
+  - Type: `String`
+
+- `Oem`
+  This is the manufacturer/provider specific extension.
+  - Type: `Binary`
+
+- `OriginOfCondition`
+  This indicates the resource that originated the condition that caused the event to be generated.
+  - Type: `String`
+
+- `Severity`
+  This is the severity of the event.
+  - Type: `String`
+
+- `Resolution`
+  The following fields are defined in Redfish schema Message.v1_0_8.
+  These are additional information returned from Message Registry.
+	Used to provide suggestions on how to resolve the situation that caused the error.
+  - Type: `String`
+
+
+## Size Limits
 
 Cloud Native Events will be forwarded through one or more generic
 intermediaries, each of which might impose limits on the size of forwarded
@@ -315,42 +471,77 @@ control and selective disclosure, rather than having sensitive details embedded
 in the event directly.
 
 
+## Example
 
-
-# Example
-
-
+### Cloud Native Events
 The following example shows a Cloud Native Events serialized as JSON:
 (Following json should be validated with Cloud native events event_spec.json schema)
 
-
 ```JSON
 {
-
-    "id": "5ce55d17-9234-4fee-a589-d0f10cb32b8e",
-    "type": "event.synchronization-state-chang",
-    "time": "2021-02-05T17:31:00Z",
-    "data": {
+  "id": "5ce55d17-9234-4fee-a589-d0f10cb32b8e",
+  "type": "event.synchronization-state-chang",
+  "time": "2021-02-05T17:31:00Z",
+  "data": {
     "version": "v1.0",
-    "values": [{
-        "resource": "/cluster/node/ptp", 
+    "values": [
+      {
+        "resource": "/cluster/node/ptp",
         "data_type": "notification",
         "value_type": "enumeration",
         "value": "ACQUIRING-SYNC"
-    }, {
-
+      },
+      {
         "resource": "/cluster/node/clock",
         "data_type": "metric",
         "value_type": "decimal64.3",
         "value": 100.3
-    }]
-    }
+      }
+    ]
+  }
 }
-
 ```
 
-# Example
+### Cloud Native Events with Redfish hardware event data
+The following example shows a Cloud Native Events with Redfish data serialized as JSON:
+(The Redfish data should be validated with https://redfish.dmtf.org/schemas/v1/Event.v1_4_1.json schema)
 
+```JSON
+{
+  "id": "438704b1-cf54-4b81-b03a-491a76b0e371",
+  "type": "HW_EVENT",
+  "time": "2021-08-09T18:29:51.187379474Z",
+  "data": {
+    "version": "v1.0",
+    "data": {
+      "@odata.context": "/redfish/v1/$metadata#Event.Event",
+      "@odata.id": "/redfish/v1/EventService/Events/5e004f5a-e3d1-11eb-ae9c-3448edf18a38",
+      "@odata.type": "#Event.v1_3_0.Event",
+      "Context": "any string is valid",
+      "Events": [
+        {
+          "Context": "any string is valid",
+          "EventId": "2162",
+          "EventTimestamp": "2021-07-13T15:07:59+0300",
+          "EventType": "Alert",
+          "MemberId": "615703",
+          "Message": "The system board Inlet temperature is less than the lower warning threshold.",
+          "MessageArgs": [
+            "Inlet"
+          ],
+          "MessageArgs@odata.count": 1,
+          "MessageId": "TMP0100",
+          "Severity": "Warning"
+        }
+      ],
+      "Id": "5e004f5a-e3d1-11eb-ae9c-3448edf18a38",
+      "Name": "Event Array"
+    }
+  }
+}
+```
+
+### Cloud Events
 The following example shows a Cloud Native Events embeded in CloudEvents and serialized as JSON:
 (Following json should be validated with CloudEvents scheam at https://github.com/cloudevents/spec/blob/v1.0.1/spec.json)
 
@@ -380,5 +571,46 @@ The following example shows a Cloud Native Events embeded in CloudEvents and ser
     ]
   }
 }
+```
 
+### Cloud Events with Redfish hardware event data
+The following example shows a Cloud Native Events with Redfish hardware event data embeded in CloudEvents and serialized as JSON:
+(Following json should be validated with CloudEvents scheam at https://github.com/cloudevents/spec/blob/v1.0.1/spec.json)
+
+```JSON
+{
+  "type": "HW_EVENT",
+  "source": "/cluster/node/mynode/redfish/event",
+  "id": "789be75d-7ac3-472e-bbbc-6d62878aad4a",
+  "time": "2021-08-09T18:29:51.187379474Z",
+  "datacontenttype": "application/json",
+  "specversion": "v1.0",
+  "data": {
+    "version": "v1.0",
+    "data": {
+      "@odata.context": "/redfish/v1/$metadata#Event.Event",
+      "@odata.id": "/redfish/v1/EventService/Events/5e004f5a-e3d1-11eb-ae9c-3448edf18a38",
+      "@odata.type": "#Event.v1_3_0.Event",
+      "Context": "any string is valid",
+      "Events": [
+        {
+          "Context": "any string is valid",
+          "EventId": "2162",
+          "EventTimestamp": "2021-07-13T15:07:59+0300",
+          "EventType": "Alert",
+          "MemberId": "615703",
+          "Message": "The system board Inlet temperature is less than the lower warning threshold.",
+          "MessageArgs": [
+            "Inlet"
+          ],
+          "MessageArgs@odata.count": 1,
+          "MessageId": "TMP0100",
+          "Severity": "Warning"
+        }
+      ],
+      "Id": "5e004f5a-e3d1-11eb-ae9c-3448edf18a38",
+      "Name": "Event Array"
+    }
+  }
+}
 ```
