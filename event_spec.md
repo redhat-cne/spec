@@ -423,7 +423,7 @@ The following attributes are OPTIONAL to be present in the `EventRecord` propert
 
 - `OriginOfCondition`
   This indicates the resource that originated the condition that caused the event to be generated.
-  - Type: `String`
+  - Type: `Binary`
 
 - `Severity`
   This is the severity of the event.
