@@ -76,9 +76,9 @@ Context metadata will be encapsulated in the event as resource address.
 
 #### Consumer
 
-A "consumer" receives the event and acts upon it. It uses the context and data
+A `consumer` receives the event and acts upon it. It uses the context and data
 to execute some logic, which might lead to the occurrence of new events.
-In Cloud Native Events consumer is a sidecar.
+In Cloud Native Events `consumer` is a sidecar.
 
 #### intermediary/sidecar
 
@@ -97,7 +97,7 @@ information.
 
 #### Event Format
 
-An Event Format specifies how to serialize a Cloud Native Events as a sequence of bytes.
+An Event Format specifies how to serialize a Cloud Native Event as a sequence of bytes.
 Stand-alone event formats, such as the [JSON format](json-format.md), specify
 serialization independent of any protocol or storage medium. Protocol Bindings
 MAY define formats that are dependent on the protocol.
@@ -125,7 +125,7 @@ string-encoding for each type that MUST be supported by all implementations.
 - `Boolean` - a boolean value of "true" or "false".
   - String encoding: a case-sensitive value of `true` or `false`.
 - `Integer` - A whole number in the range -2,147,483,648 to +2,147,483,647
-  inclusive. This is the range of a signed, 32-bit, twos-complement encoding.
+  inclusive. This is the range of a signed, 32-bit, two's-complement encoding.
   Event formats do not have to use this encoding, but they MUST only use
   `Integer` values in this range.
   - String encoding: Integer portion of the JSON Number per
@@ -236,8 +236,8 @@ This is defined in the next section.
 
 Cloud Native Events data includes a version number and a generic `Values` field or a Redfish hardware specific `Data` field.
 As defined by the term Data, Cloud Native Events data MAY include domain-specific
-information about the occurrence based on enumeramtion type. When present, this information will be
-encapsulated within `data.value_type`.
+information about the occurrence based on enumeration type. When present, this information will be
+encapsulated within `data.valueType`.
 
 ### version
 
@@ -258,21 +258,27 @@ encapsulated within `data.value_type`.
   - MUST be a non-empty string
 
 ### Values
-Values represent array of event types that occured for a given occurance of event 
-[{data_type:"[data_type](#data_type)"}, "resource":[resource](#resouorce)],"[value_type](#value_type)","[value](#value)}]
+Values represent array of event types that occured for a given occurance of event:
+{"dataType": "[dataType](#dataType)",
+ "resource": "[resource](#resource)",
+ "valueType": [valueType](#valueType)",
+ "value": "[value](#value)"}
 
-“data_type”: “notification”
-              “resource” : “/sync/sync-status/sync-state”,
-               “value_type” : “enumeration”,
-               "value" : ”HOLDOVER"
+Example:
 
+```
+"dataType": "notification"
+"resource": "/sync/sync-status/sync-state",
+"valueType": "enumeration",
+"value": "HOLDOVER"
+```
 
-#### data_type
-Defines tthe event types . This can be of two types.
--`notification`
-  Notificatuion types defines the event data is of type notification of event occured.
+#### dataType
+Defines the event types . This can be of two types:
+- `notification`
+  Notification types define the event data as of type notification of event occured.
 - `metric`
-   metric are time-series data in decimal format.
+   metrics are time-series data in decimal format.
 
 #### resource
 Yang path to value specification.
@@ -286,13 +292,12 @@ Address Component |  Description |  Example |
 clusterName | The name of the cloud where the producer exists.  A ‘.’ can be used to indicate the cluster where the consumer exists. | eastern-edge  | 
 siteName | The name of the site containing the node(s) that the event producer is located in. A regular expression with * or . may be specified to subscribe to multiple sites.  | cellsite16385  |
 nodeName  | Name of the Worker node or Compute node where the producer exists.  The name must map to the nomenclature in use for the underlying cloud infrastructure.  A regular expression with * or . may be specified to subscribe to multiple nodes. | node27 or node* -> all nodes | 
-resource | The hierarchical name for the resource.  For this specification, the resource hierarchy will align with the yang models specified in O-RAN.WG4.MP-Yangs-v05.00 to the extent possible.  A * may be specified in the address hierarchy to subscribe to events below the specified level.| ../o-ran-sync/sync-group/sync-status/sync-state , ../o-ran-sync/sync-group/*| 
+resource | The hierarchical name for the resource.  For this specification, the resource hierarchy will align with the Yang models specified in O-RAN.WG4.MP-Yangs-v05.00 to the extent possible.  A * may be specified in the address hierarchy to subscribe to events below the specified level.| ../o-ran-sync/sync-group/sync-status/sync-state , ../o-ran-sync/sync-group/*| 
 
 
-#### value_type
-- `value_type`
+#### valueType
+- `valueType`
     The type format of the [`value`](#value) property.
-
 
 #### value
 - `value`
@@ -440,7 +445,7 @@ The following attributes are OPTIONAL to be present in the `EventRecord` propert
 
 Cloud Native Events will be forwarded through one or more generic
 intermediaries, each of which might impose limits on the size of forwarded
-events. The Cloud Native Events is wrapped within the CloudEvents json objkect (See CloudEvents Spec here)
+events. The Cloud Native Events is wrapped within the CloudEvents json object (See CloudEvents Spec [here](https://github.com/cloudevents/spec/blob/v1.0.1/spec.md))
 
 The "size" of an event is its wire-size and includes every bit that is
 transmitted on the wire for the event: protocol frame-metadata, event metadata,
@@ -452,8 +457,8 @@ different protocols or for events to be re-encoded, the least efficient
 protocol and encoding used by the application SHOULD be considered for
 compliance with these size constraints:
 
-- Intermediaries MUST?MAY wrap Cloud Native Events wwithin CloudEvents object and forwarded data 
-   size shouldbe of 64 KByte or less.
+- Intermediaries MUST wraps Cloud Native Events within CloudEvents object and forwarded data 
+   size should be of 64 KByte or less.
 - Consumers SHOULD accept events of a size of at least 64 KByte.
 
 In effect, these rules will allow producers to publish events up to 64KB in size
@@ -487,63 +492,36 @@ The following example shows a Cloud Native Events serialized as JSON:
     "values": [
       {
         "resource": "/cluster/node/ptp",
-        "data_type": "notification",
-        "value_type": "enumeration",
+        "dataType": "notification",
+        "valueType": "enumeration",
         "value": "ACQUIRING-SYNC"
       },
       {
         "resource": "/cluster/node/clock",
-        "data_type": "metric",
-        "value_type": "decimal64.3",
+        "dataType": "metric",
+        "valueType": "decimal64.3",
         "value": 100.3
+      },
+      {
+        "resource": "/cluster/node/temp",
+        "dataType": "notification",
+        "valueType": "redfish-event",
+        "value": {
+        "@odata.context": "/redfish/v1/$metadata#Event.Event",
+        "@odata.type": "#Event.v1_3_0.Event",
+        "Context": "any string is valid",
+        "Events": [{"EventId": "2162", "MemberId": "615703", "MessageId": "TMP0100"}],
+        "Id": "5e004f5a-e3d1-11eb-ae9c-3448edf18a38",
+        "Name": "Event Array",
       }
     ]
   }
 }
 ```
 
-### Cloud Native Events with Redfish hardware event data
-The following example shows a Cloud Native Events with Redfish data serialized as JSON:
-(The Redfish data should be validated with https://redfish.dmtf.org/schemas/v1/Event.v1_4_1.json schema)
-
-```JSON
-{
-  "id": "438704b1-cf54-4b81-b03a-491a76b0e371",
-  "type": "HW_EVENT",
-  "time": "2021-08-09T18:29:51.187379474Z",
-  "data": {
-    "version": "v1.0",
-    "data": {
-      "@odata.context": "/redfish/v1/$metadata#Event.Event",
-      "@odata.id": "/redfish/v1/EventService/Events/5e004f5a-e3d1-11eb-ae9c-3448edf18a38",
-      "@odata.type": "#Event.v1_3_0.Event",
-      "Context": "any string is valid",
-      "Events": [
-        {
-          "Context": "any string is valid",
-          "EventId": "2162",
-          "EventTimestamp": "2021-07-13T15:07:59+0300",
-          "EventType": "Alert",
-          "MemberId": "615703",
-          "Message": "The system board Inlet temperature is less than the lower warning threshold.",
-          "MessageArgs": [
-            "Inlet"
-          ],
-          "MessageArgs@odata.count": 1,
-          "MessageId": "TMP0100",
-          "Severity": "Warning"
-        }
-      ],
-      "Id": "5e004f5a-e3d1-11eb-ae9c-3448edf18a38",
-      "Name": "Event Array"
-    }
-  }
-}
-```
-
 ### Cloud Events
-The following example shows a Cloud Native Events embeded in CloudEvents and serialized as JSON:
-(Following json should be validated with CloudEvents scheam at https://github.com/cloudevents/spec/blob/v1.0.1/spec.json)
+The following example shows a Cloud Native Events embedded in CloudEvents and serialized as JSON:
+(Following json should be validated with CloudEvents schema at https://github.com/cloudevents/spec/blob/v1.0.1/spec.json)
 
 ```JSON
 {
@@ -559,58 +537,16 @@ The following example shows a Cloud Native Events embeded in CloudEvents and ser
       {
         "type": "notification",
         "resource": "/sync/sync-status/sync-state",
-        "value_type": "enumeration",
+        "valueType": "enumeration",
         "value": "HOLDOVER"
       },
       {
         "type": "notification",
         "resource": "/sync/sync-status/sync-state",
-        "value_type": "enumeration",
+        "valueType": "enumeration",
         "value": "HOLDOVER"
       }
     ]
-  }
-}
-```
-
-### Cloud Events with Redfish hardware event data
-The following example shows a Cloud Native Events with Redfish hardware event data embeded in CloudEvents and serialized as JSON:
-(Following json should be validated with CloudEvents scheam at https://github.com/cloudevents/spec/blob/v1.0.1/spec.json)
-
-```JSON
-{
-  "type": "HW_EVENT",
-  "source": "/cluster/node/mynode/redfish/event",
-  "id": "789be75d-7ac3-472e-bbbc-6d62878aad4a",
-  "time": "2021-08-09T18:29:51.187379474Z",
-  "datacontenttype": "application/json",
-  "specversion": "v1.0",
-  "data": {
-    "version": "v1.0",
-    "data": {
-      "@odata.context": "/redfish/v1/$metadata#Event.Event",
-      "@odata.id": "/redfish/v1/EventService/Events/5e004f5a-e3d1-11eb-ae9c-3448edf18a38",
-      "@odata.type": "#Event.v1_3_0.Event",
-      "Context": "any string is valid",
-      "Events": [
-        {
-          "Context": "any string is valid",
-          "EventId": "2162",
-          "EventTimestamp": "2021-07-13T15:07:59+0300",
-          "EventType": "Alert",
-          "MemberId": "615703",
-          "Message": "The system board Inlet temperature is less than the lower warning threshold.",
-          "MessageArgs": [
-            "Inlet"
-          ],
-          "MessageArgs@odata.count": 1,
-          "MessageId": "TMP0100",
-          "Severity": "Warning"
-        }
-      ],
-      "Id": "5e004f5a-e3d1-11eb-ae9c-3448edf18a38",
-      "Name": "Event Array"
-    }
   }
 }
 ```
