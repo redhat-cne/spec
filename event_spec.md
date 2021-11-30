@@ -234,10 +234,8 @@ This is defined in the next section.
 
 ## Event Data
 
-Cloud Native Events data includes a version number and a generic `Values` field or a Redfish hardware specific `Data` field.
-As defined by the term Data, Cloud Native Events data MAY include domain-specific
-information about the occurrence based on enumeration type. When present, this information will be
-encapsulated within `data.valueType`.
+Cloud Native Events data includes a version number and a generic `Values` field.
+As defined by the term Data, Cloud Native Events data MAY include domain-specific information about the occurrence based on enumeration type. When present, this information will be encapsulated within `data.valueType`.
 
 ### version
 
@@ -302,144 +300,6 @@ resource | The hierarchical name for the resource.  For this specification, the 
 #### value
 - `value`
   String representation of value in value_type format
-
-### Data
-Data represents a Redfish Event as defined in Redfish schema
- [Event.v1_4_1.json](https://redfish.dmtf.org/schemas/v1/Event.v1_4_1.json).
-The Event schema describes the JSON payload received by an Event Destination,
-which has subscribed to event notification, when events occur.  This Resource
-contains data about events, including descriptions, severity, and a MessageId
-link to a Message Registry that can be accessed for further information.
-
-#### REQUIRED Attributes
-
-The following attributes are REQUIRED to be present in the `Data` property.
-
-- `@odata.type`
-	The type of a resource.
-  - Type: `String`
-
-- `Events`
-	Array of event records with type `EventRecord`.
-  - Type: array of `EventRecord`
-
-- `Id`
-	ID of the event.
-  - Type: `String`
-
-- `Name`
-  Name of event.
-  - Type: `String`
-
-#### OPTIONAL Attributes
-
-The following attributes are OPTIONAL to be present in the `Data` property.
-
-- `@odata.context`
-  The OData description of a payload. 
-  - Type: `String`
-
-- `Actions`
-  The available actions for this resource.
-  - Type: `Binary`.
-
-- `Context`
-   A context can be supplied at subscription time.  This property is the
-   context value supplied by the subscriber.
-  - Type: `String`
-
-- `Description`
-  The description of this resource. Used for commonality in the schema definitions.
-  - Type: `String`
-
-- `Oem`
-  This is the manufacturer/provider specific extension.
-  - Type: `Binary`
-
-#### EventRecord
-EventRecord is defined in Redfish schema
-[Event_v1_4_1_EventRecord](https://redfish.dmtf.org/schemas/v1/Event.v1_4_1.json).
-Additional information returned from Message Registry is added from
-[Message.v1_0_8](https://redfish.dmtf.org/schemas/v1/Message.v1_0_8.json).
-
-
-##### REQUIRED Attributes
-
-The following attributes are REQUIRED to be present in the `EventRecord` property.
-
-- `EventType`
-	This indicates the type of event sent, according to the definitions in the EventService.
- 
-- `MessageId`
-	This property shall be a key into message registry as described in the Redfish specification.
-
-- `MemberId`
-	 This is the identifier for the member within the collection.
-
-
-##### OPTIONAL Attributes
-
-The following attributes are OPTIONAL to be present in the `EventRecord` property.
-
-- `Actions`
-  The available actions for this resource.
-  - Type: `Binary`.
-
-- `Context`
-   This property has been Deprecated in favor of Context found at the root level of the object.
-  - Type: `String`
-
-- `EventGroupId`
-  This value is the identifier used to correlate events that came from the same cause.
-  - Type: `Int`
-
-- `EventId`
-  The value of this property shall indicate a unique identifier for the event.
-  - Type: `String`
-
-- `EventTimestamp`
-  This is time the event occurred.
-  - Type: `String`.
-
-- `Message`
-  Full message of the event.
-  - Type: `String`
-
-- `Message`
-  Message of the event.
-  - Type: `String`
-
-- `Message`
-  This property shall contain an optional human readable message.
-  - Type: `String`
-
-- `MessageArgs`
-  This array of message arguments are substituted for the arguments
-	in the message when looked up in the message registry.
-  - Type: array of `String`
-
-- `MessageId`
-  This property shall be a key into message registry as described in the Redfish specification.
-  - Type: `String`
-
-- `Oem`
-  This is the manufacturer/provider specific extension.
-  - Type: `Binary`
-
-- `OriginOfCondition`
-  This indicates the resource that originated the condition that caused the event to be generated.
-  - Type: `Binary`
-
-- `Severity`
-  This is the severity of the event.
-  - Type: `String`
-
-- `Resolution`
-  The following fields are defined in Redfish schema Message.v1_0_8.
-  These are additional information returned from Message Registry.
-	Used to provide suggestions on how to resolve the situation that caused the error.
-  - Type: `String`
-
 
 ## Size Limits
 
@@ -512,7 +372,7 @@ The following example shows a Cloud Native Events serialized as JSON:
         "Context": "any string is valid",
         "Events": [{"EventId": "2162", "MemberId": "615703", "MessageId": "TMP0100"}],
         "Id": "5e004f5a-e3d1-11eb-ae9c-3448edf18a38",
-        "Name": "Event Array",
+        "Name": "Event Array"
       }
     ]
   }
