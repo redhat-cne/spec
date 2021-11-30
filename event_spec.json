@@ -92,7 +92,7 @@
           {
             "if": {
               "properties": {
-                "data_type": {
+                "dataType": {
                   "const": "metric"
                 }
               }
@@ -104,7 +104,7 @@
           {
             "if": {
               "properties": {
-                "data_type": {
+                "dataType": {
                   "const": "notification"
                 }
               }
@@ -178,11 +178,11 @@
                     "/sync/sync-status/sync-state"
                   ]
                 },
-                "data_type": {
+                "dataType": {
                   "description": "Defines the event types as either notification or metric",
                   "$ref": "#/definitions/datatypedef"
                 },
-                "value_type": {
+                "valueType": {
                   "description": "The type format of the value property, either string or number format",
                   "$ref": "#/definitions/valuetypedef"
                 },
@@ -193,8 +193,8 @@
               },
               "required": [
                 "resource",
-                "data_type",
-                "value_type",
+                "dataType",
+                "valueType",
                 "value"
               ],
               "additionalProperties": false
