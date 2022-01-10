@@ -200,6 +200,32 @@ The following attributes are REQUIRED to be present in all Cloud Native Events:
 - Examples
   - cevent.synchronization-state-change
 
+### source
+
+- Type: `String`
+- Description: Identifies the context in which an event happened. Often this
+  will include information such as the type of the event source, the
+  organization publishing the event or the process that produced the event. The
+  exact syntax and semantics behind the data encoded in the URI is defined by
+  the event producer.
+
+  Producers MUST ensure that `source` + `id` is unique for each distinct event.
+
+  An application MAY assign a unique `source` to each distinct producer, which
+  makes it easy to produce unique IDs since no other producer will have the same
+  source. The application MAY use UUIDs, URNs, DNS authorities or an
+  application-specific scheme to create unique `source` identifiers.
+
+  A source MAY include more than one producer. In that case the producers MUST
+  collaborate to ensure that `source` + `id` is unique for each distinct event.
+
+- Constraints:
+  - REQUIRED
+  - MUST be a non-empty string
+  - An absolute URI is RECOMMENDED
+- Examples
+  - /cluster/node/example.com/ptp/clock_realtime
+
 ### dataContentType
 
 - Type: `String`
@@ -346,24 +372,52 @@ The following example shows a Cloud Native Events serialized as JSON:
 {
   "id": "5ce55d17-9234-4fee-a589-d0f10cb32b8e",
   "type": "event.synchronization-state-chang",
+  "source": "/cluster/node/ptp",
   "time": "2021-02-05T17:31:00Z",
   "data": {
     "version": "v1.0",
     "values": [
       {
-        "resource": "/cluster/node/ptp",
+        "resource": "/sync/sync-status/sync-state",
         "dataType": "notification",
         "valueType": "enumeration",
         "value": "ACQUIRING-SYNC"
       },
       {
-        "resource": "/cluster/node/clock",
+        "resource": "/sync/sync-status/sync-state",
         "dataType": "metric",
         "valueType": "decimal64.3",
         "value": 100.3
       },
       {
         "resource": "/cluster/node/temp",
+        "dataType": "notification",
+        "valueType": "redfish-event",
+        "value": {
+        "@odata.context": "/redfish/v1/$metadata#Event.Event",
+        "@odata.type": "#Event.v1_3_0.Event",
+        "Context": "any string is valid",
+        "Events": [{"EventId": "2162", "MemberId": "615703", "MessageId": "TMP0100"}],
+        "Id": "5e004f5a-e3d1-11eb-ae9c-3448edf18a38",
+        "Name": "Event Array"
+      }
+    ]
+  }
+}
+```
+Example of a Cloud Native Event with Redfish content:
+
+```JSON
+{
+  "id": "5ce55d17-9234-4fee-a589-d0f10cb32b8e",
+  "type": "event.redfish.alert",
+  "source": "/cluster/node/nodename.example.com/redfish/event",
+  "time": "2021-02-05T17:31:00Z",
+  "data": {
+    "version": "v1.0",
+    "values": [
+      {
+        "resource": "/redfish/v1/Systems",
         "dataType": "notification",
         "valueType": "redfish-event",
         "value": {
